@@ -8,7 +8,8 @@ namespace Tuner.Timer
 		{
 				
 				Dictionary<string,Timer> mTimers = new Dictionary<string, Timer> ();
-
+				Dictionary<string,Timer> mAdding = new Dictionary<string, Timer> ();
+		
 				public void Add (string name, float time, TimerCallback callback, System.Object state)
 				{
 						
@@ -16,7 +17,7 @@ namespace Tuner.Timer
 						Timer temp = null;
 						if (!mTimers.TryGetValue (name, out temp)) {
 								temp = new Timer (Time.time, triggerTime, callback, state);
-								mTimers.Add (name, temp);
+								mAdding.Add (name, temp);
 						} else {
 								temp.Init (Time.time, triggerTime, callback, state);
 						}
@@ -58,7 +59,6 @@ namespace Tuner.Timer
 						if (mTimers.TryGetValue (name, out temp)) {
 								return temp.PassPercent;
 						}
-						Debug.Log ("3333");
 						return 0;
 				}
 
@@ -82,6 +82,10 @@ namespace Tuner.Timer
 
 				public void Update ()
 				{
+						foreach (KeyValuePair<string,Timer> item in mAdding) {
+								mTimers.Add (item.Key,item.Value);
+						}
+						mAdding.Clear ();
 						foreach (KeyValuePair<string,Timer> item in mTimers) {
 								item.Value.Update ();
 						}
